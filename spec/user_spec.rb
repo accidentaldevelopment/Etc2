@@ -27,8 +27,6 @@ describe Etc2::User do
       etc2_user.name.should == etc_user.name
     end
     
-    it 'should have the right passwd'
-    
     it 'should have the right uid' do
       etc2_user.uid.should == etc_user.uid
     end
