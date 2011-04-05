@@ -16,8 +16,18 @@ describe Etc2::Shadow do
   end
 
   context 'information correctness' do
-    # let(:etc_user) { Etc.getpwnam('root') }
-    let(:etc2_user){ Etc2::Shadow.find('root')  }
+    let(:etc2_shadow){ Etc2::Shadow.find('root')  }
+    
+    it 'should have the correct usrename' do
+      etc2_shadow.name.should == 'root'
+    end
+    
+    it 'should have an encrypted password' do
+      correct_shadow = `getent shadow root`.split(':')[1].strip
+      etc2_shadow.passwd.should == correct_shadow
+      etc2_shadow.password.should == etc2_shadow.passwd
+      etc2_shadow.encrypted_password.should == etc2_shadow.passwd
+    end
   end
 end
 

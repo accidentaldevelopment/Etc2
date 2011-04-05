@@ -96,13 +96,17 @@ static VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 	s = getspnam(shadowname);
 	if(s == NULL) rb_raise(rb_eArgError, "Shadow entry not found for username: %s", shadowname);
 	
-	rb_iv_set(obj, "@name", CSTR2STR(s->sp_namp));
+	rb_iv_set(obj, "@name",   CSTR2STR(s->sp_namp));
+	rb_iv_set(obj, "@passwd", CSTR2STR(s->sp_pwdp));
 	return obj;
 }
 
 static VALUE rb_cShadow_init(VALUE self){
 	shadow_attr("name", 1, 0);
+	shadow_attr("passwd", 1, 0);
 	
+	rb_define_alias(rb_cShadow, "password", "passwd");
+	rb_define_alias(rb_cShadow, "encrypted_password", "passwd");
 	return Qtrue;
 }
 #endif /* HAVE_SHADOW_H */
