@@ -1,9 +1,13 @@
 require 'mkmf'
 
-passwd = have_header('pwd.h')
-group  = have_header('grp.h')
-shadow = have_header('shadow.h')
+required = true
+# These headers are required, no point in building this without them
+required &= have_header('pwd.h')
+required &= have_header('grp.h')
 
-if passwd || group || shadow
-  create_makefile 'etc2'
-end
+# These aren't required, but fun
+have_header('shadow.h')
+have_func('crypt')
+
+# Create Makefile as long as the required stuff is available
+create_makefile 'etc2' if required

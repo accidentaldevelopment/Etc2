@@ -8,9 +8,16 @@ static VALUE rb_mEtc2_hasShadow(VALUE mod) {
 #endif /* HAVE_SHADOW_H */
 }
 
+#ifdef HAVE_CRYPT
+static VALUE rb_mEtc2_crypt(VALUE mod, VALUE txt, VALUE salt) {
+	char *result = crypt(STR2CSTR(txt), STR2CSTR(salt));
+	return CSTR2STR(result);
+}
+#endif /* HAVE_CRYPT */
+
 #ifdef HAVE_PWD_H
 static VALUE rb_cUser_find(VALUE mod, VALUE user_lookup) {
-	VALUE obj = rb_funcall(rb_cUser, NEW, 0);
+	VALUE obj = rb_class_new_instance(0, NULL, rb_cUser); //rb_funcall(rb_cUser, NEW, 0);
 	struct passwd *p;
 	if(TYPE(user_lookup) == T_STRING) {
 		char *username = STR2CSTR(user_lookup);
@@ -52,7 +59,7 @@ static VALUE rb_cUser_init(VALUE self) {
 
 #ifdef HAVE_GRP_H
 static VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
-	VALUE obj = rb_funcall(rb_cGroup, NEW, 0);
+	VALUE obj = rb_class_new_instance(0, NULL, rb_cGroup);
 	struct group *g;
 	if(TYPE(group_lookup) == T_STRING) {
 		char *groupname = STR2CSTR(group_lookup);
@@ -90,7 +97,7 @@ static VALUE rb_cGroup_init(VALUE self) {
 
 #ifdef HAVE_SHADOW_H
 static VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
-	VALUE obj = rb_funcall(rb_cShadow, NEW, 0);
+	VALUE obj = rb_class_new_instance(0, NULL, rb_cShadow);
 	struct spwd *s;
 	char *shadowname = STR2CSTR(shadow_lookup);
 	s = getspnam(shadowname);
@@ -114,6 +121,9 @@ static VALUE rb_cShadow_init(VALUE self){
 void Init_etc2() {
 	rb_mEtc2 = rb_define_module("Etc2");
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
+#ifdef HAVE_CRYPT
+	rb_define_module_function(rb_mEtc2, "crypt", rb_mEtc2_crypt, 2);
+#endif /* HAVE_CRYPT */
 	
 #ifdef HAVE_PWD_H
 	rb_cUser = rb_define_class_under(rb_mEtc2, "User", rb_cObject);

@@ -16,4 +16,29 @@ describe Etc2 do
       it('should return true for has_shadow?'){ Etc2.has_shadow?.should be_true}
     end
   end
+  
+  context '#crypt' do
+    it 'should encrypt a string with DES' do
+      txt,salt = 'this is a test', 's1'
+      result   = 's1DxyEuMylla6'
+      Etc2.crypt(txt,salt).should == result
+    end
+  if RUBY_PLATFORM =~ /linux/
+    let(:text){ 'this is a test' }
+    let(:salt){ 'saltystring'}
+    
+    it 'should do MD5 encrypting' do
+      Etc2.crypt(text, '$1$' + salt + '$').should == '$1$saltystr$DDQHJy3Lz/pqQGuF57hbd.'
+    end
+    
+    it 'should do SHA256 encrypting' do
+      Etc2.crypt(text, '$5$' + salt + '$').should == '$5$saltystring$13k9Wc4IgCrmY/S1depNkWHh9eFvy62s7xFlmW8KZ2D'
+    end
+    
+    it 'should do SHA512 encrypting' do
+      Etc2.crypt(text, '$6$' + salt + '$').should == '$6$saltystring$9hcyNJduz/BgCm1tNClS/jv7Xc7VhZ1DJSZk5wXsfB/X/aLI6MSq2c3wS0e.uynaY2VvWUXU55JBVzhSTM4o70'
+    end
+  end
+  
+  end
 end
