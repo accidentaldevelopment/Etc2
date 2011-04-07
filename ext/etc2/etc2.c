@@ -1,5 +1,8 @@
 #include "etc2.h"
 
+/*
+ * Returns true if support for shadow.h was included
+ */
 static VALUE rb_mEtc2_hasShadow(VALUE mod) {
 #ifdef HAVE_SHADOW_H
 	return Qtrue;
@@ -9,6 +12,27 @@ static VALUE rb_mEtc2_hasShadow(VALUE mod) {
 }
 
 #ifdef HAVE_CRYPT
+/*
+ * Document-method: crypt
+ * call-seq:
+ *   Etc2.crypt(key, salt) -> encrypted_string
+ *
+ * Returns +key+ encrypted with +salt+
+ * 
+ * Default encryption type is DES.
+ *
+ * == Encryption Algorithm
+ * On systems that support it, you can change the encryption by specifying a magic number in the salt.
+ * This is done by formatting the salt like:
+ *   $n$saltsalt$
+ * when +n+ is the magic number.
+ *
+ * Available magic numbers and their encryption types are:
+ *
+ * - $1$saltsalt$ MD5
+ * - $5$saltsalt$ SHA256
+ * - $6$saltsalt$ SHA512
+ */
 static VALUE rb_mEtc2_crypt(VALUE mod, VALUE txt, VALUE salt) {
 	char *result = crypt(STR2CSTR(txt), STR2CSTR(salt));
 	return CSTR2STR(result);
@@ -16,6 +40,15 @@ static VALUE rb_mEtc2_crypt(VALUE mod, VALUE txt, VALUE salt) {
 #endif /* HAVE_CRYPT */
 
 #ifdef HAVE_PWD_H
+/*
+ * call-seq:
+ *   (User) find(lookup)
+ * Find a user based on the username or UID
+ *
+ * @param  [String,Fixnum] lookup The username or UID to search for
+ * @return [User]    A user object or nil if one couldn't be found
+ * @raise  [ArgumentError] If the username or uid can't be found
+ */
 static VALUE rb_cUser_find(VALUE mod, VALUE user_lookup) {
 	VALUE obj = rb_class_new_instance(0, NULL, rb_cUser); //rb_funcall(rb_cUser, NEW, 0);
 	struct passwd *p;
@@ -38,6 +71,21 @@ static VALUE rb_cUser_find(VALUE mod, VALUE user_lookup) {
 	rb_iv_set(obj, "@dir",    CSTR2STR(p->pw_dir));
 	rb_iv_set(obj, "@shell",  CSTR2STR(p->pw_shell));
 	return obj;
+}
+
+/*
+ * Builds a user object for the current user.  <br />
+ * Based on getlogin() or $USER, if getlogin() isn't available. <br/><br/>
+ * <strong>Note:</strong> It's probably pretty easy to trick this; I wouldn't rely on it for security.
+ *
+ * @return [User] A User object for the current user
+ */
+static VALUE rb_cUser_current(VALUE mod) {
+#ifdef HAVE_GETLOGIN
+	return rb_cUser_find(mod, CSTR2STR(getlogin()));
+#else
+	return rb_cUser_find(mod, CSTR2STR(getenv("USER")));
+#endif
 }
 
 static VALUE rb_cUser_init(VALUE self) {
@@ -73,11 +121,8 @@ static VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	}
 	
 	VALUE mem_ary = rb_ary_new();
-	char **mem = g->gr_mem;
-	while(*mem) {
-		rb_ary_push(mem_ary, CSTR2STR(*mem)); //rb_cUser_find((VALUE)NULL, CSTR2STR(*mem)));
-		mem++;
-	}
+	for(g->gr_mem; *g->gr_mem; *g->gr_mem++)
+		rb_ary_push(mem_ary, CSTR2STR(*g->gr_mem));
 	
 	rb_iv_set(obj, "@name",   CSTR2STR(g->gr_name));
 	rb_iv_set(obj, "@passwd", CSTR2STR(g->gr_passwd));
@@ -101,7 +146,8 @@ static VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 	struct spwd *s;
 	char *shadowname = STR2CSTR(shadow_lookup);
 	s = getspnam(shadowname);
-	if(s == NULL) rb_raise(rb_eArgError, "Shadow entry not found for username: %s", shadowname);
+	if (getuid() != 0 || geteuid() != 0) rb_raise(rb_const_get(rb_mErrno, rb_intern("EACCES")), "Must be root to access shadow database");
+	else if(s == NULL) rb_raise(rb_eArgError, "Shadow entry not found for username: %s", shadowname);
 	
 	rb_iv_set(obj, "@name",   CSTR2STR(s->sp_namp));
 	rb_iv_set(obj, "@passwd", CSTR2STR(s->sp_pwdp));
@@ -120,6 +166,7 @@ static VALUE rb_cShadow_init(VALUE self){
 
 void Init_etc2() {
 	rb_mEtc2 = rb_define_module("Etc2");
+	rb_define_const(rb_mEtc2, "VERSION", VERSION);
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
 #ifdef HAVE_CRYPT
 	rb_define_module_function(rb_mEtc2, "crypt", rb_mEtc2_crypt, 2);
@@ -128,6 +175,7 @@ void Init_etc2() {
 #ifdef HAVE_PWD_H
 	rb_cUser = rb_define_class_under(rb_mEtc2, "User", rb_cObject);
 	rb_define_module_function(rb_cUser, "find", rb_cUser_find, 1);
+	rb_define_module_function(rb_cUser, "current", rb_cUser_current, 0);
 	rb_define_method(rb_cUser, "initialize", rb_cUser_init, 0);
 #endif /* HAVE_PWD_H */
 

@@ -1,4 +1,6 @@
 *.swp
+pkg
+doc/*
 /ext/etc2/*.o
 /ext/etc2/*.bundle
 /ext/etc2/*.log

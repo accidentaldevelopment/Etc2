@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define VERSION rb_tainted_str_new2("1.0.0")
+
 #define CSTR2STR(cstr) rb_tainted_str_new2(cstr)
 #define STR2CSTR(str) StringValueCStr(str)
 #define NEW rb_intern("new")
@@ -19,6 +21,7 @@ static VALUE rb_mEtc2_crypt(VALUE, VALUE, VALUE);
 static VALUE rb_cUser;
 
 static VALUE rb_cUser_find(VALUE, VALUE);
+static VALUE rb_cUser_current(VALUE);
 static VALUE rb_cUser_init(VALUE);
 
 #endif /* HAVE_PWD_H */

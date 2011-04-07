@@ -18,38 +18,59 @@ describe Etc2::User do
       lambda{ Etc2::User.find(uid) }.should raise_error(ArgumentError, "User not found with uid: #{uid}")
     end
   end
+ 
+  # Only run if not root
+  unless Process.uid == 0
+    context '#current_user' do
+      before(:all){ @user = Etc2::User.current }
+    
+      it 'should return the correct current user' do
+        @user.name.should == ENV['USER']
+      end
+    
+      it 'should have the correct homedir' do
+        @user.dir.should == ENV['HOME']
+      end
+    
+      it 'should have the right UID' do
+        @user.uid.should == `id -u`.to_i
+      end
+    end
+  end
 
   context 'information correctness' do
-    let(:etc_user) { Etc.getpwnam('root') }
-    let(:etc2_user){ Etc2::User.find('root')  }
+    before(:all) do
+      @etc_user = Etc.getpwnam('root')
+      @etc2_user = Etc2::User.find('root')
+    end
     
     it 'should have the correct username' do
-      etc2_user.name.should == etc_user.name
+      @etc2_user.name.should == @etc_user.name
     end
     
     it 'should have the right uid' do
-      etc2_user.uid.should == etc_user.uid
+      @etc2_user.uid.should == @etc_user.uid
     end
     
     it 'should have the right gid' do
-      etc2_user.gid.should == etc_user.gid
+      @etc2_user.gid.should == @etc_user.gid
     end
   
     it 'should have the correct gecos' do
-      etc2_user.gecos.should == etc_user.gecos
-      etc2_user.full_name.should == etc2_user.gecos
+      @etc2_user.gecos.should == @etc_user.gecos
+      @etc2_user.full_name.should == @etc2_user.gecos
     end
     
     it 'should have the correct homedir' do
-      etc2_user.dir.should == etc_user.dir
+      @etc2_user.dir.should == @etc_user.dir
       # aliases
-      etc2_user.home_dir.should == etc2_user.dir
-      etc2_user.homedir.should  == etc2_user.dir
-      etc2_user.home.should     == etc2_user.dir
+      @etc2_user.home_dir.should == @etc2_user.dir
+      @etc2_user.homedir.should  == @etc2_user.dir
+      @etc2_user.home.should     == @etc2_user.dir
     end
     
     it 'should have the right shell' do
-      etc2_user.shell.should == etc_user.shell
+      @etc2_user.shell.should == @etc_user.shell
     end
   end
 end
