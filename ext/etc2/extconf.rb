@@ -12,6 +12,6 @@ have_func('getlogin')
 
 # Create Makefile as long as the required stuff is available
 if required
-  $CFLAGS << ' -std=c99'
+#  $CFLAGS << ' -std=c99'
   create_makefile 'etc2'
 end
