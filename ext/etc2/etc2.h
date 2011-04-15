@@ -1,17 +1,18 @@
 #include "ruby.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #define VERSION rb_tainted_str_new2("1.0.0")
 
 #define CSTR2STR(cstr) rb_tainted_str_new2(cstr)
 #define STR2CSTR(str) StringValueCStr(str)
-#define NEW rb_intern("new")
 
 static VALUE rb_mEtc2;
 static VALUE rb_mEtc2_hasShadow(VALUE);
+
 #ifdef HAVE_CRYPT
-static VALUE rb_mEtc2_crypt(VALUE, VALUE, VALUE);
+static VALUE rb_mEtc2_crypt(int, VALUE *, VALUE);
 #endif /* HAVE_CRYPT */
 
 #ifdef HAVE_PWD_H

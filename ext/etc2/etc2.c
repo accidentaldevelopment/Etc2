@@ -1,4 +1,5 @@
 #include "etc2.h"
+#include "utils.h"
 
 /*
  * Returns true if support for shadow.h was included
@@ -8,7 +9,7 @@ static VALUE rb_mEtc2_hasShadow(VALUE mod) {
 	return Qtrue;
 #else
 	return Qfalse;
-#endif /* HAVE_SHADOW_H */
+#endif
 }
 
 #ifdef HAVE_CRYPT
@@ -25,7 +26,7 @@ static VALUE rb_mEtc2_hasShadow(VALUE mod) {
  * On systems that support it, you can change the encryption by specifying a magic number in the salt.
  * This is done by formatting the salt like:
  *   $n$saltsalt$
- * when +n+ is the magic number.
+ * where +n+ is the magic number.
  *
  * Available magic numbers and their encryption types are:
  *
@@ -33,8 +34,17 @@ static VALUE rb_mEtc2_hasShadow(VALUE mod) {
  * - $5$saltsalt$ SHA256
  * - $6$saltsalt$ SHA512
  */
-static VALUE rb_mEtc2_crypt(VALUE mod, VALUE txt, VALUE salt) {
-	char *result = crypt(STR2CSTR(txt), STR2CSTR(salt));
+static VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
+	VALUE txt, salt;
+	char *result;
+	rb_scan_args(argc, argv, "11", &txt, &salt);
+	
+	if(NIL_P(salt)) {
+		char *gen_salt = generate_salt();
+		result = crypt(STR2CSTR(txt), gen_salt);
+	} else
+		result = crypt(STR2CSTR(txt), STR2CSTR(salt));
+	
 	return CSTR2STR(result);
 }
 #endif /* HAVE_CRYPT */
@@ -169,7 +179,7 @@ void Init_etc2() {
 	rb_define_const(rb_mEtc2, "VERSION", VERSION);
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
 #ifdef HAVE_CRYPT
-	rb_define_module_function(rb_mEtc2, "crypt", rb_mEtc2_crypt, 2);
+	rb_define_module_function(rb_mEtc2, "crypt", rb_mEtc2_crypt, -1);
 #endif /* HAVE_CRYPT */
 	
 #ifdef HAVE_PWD_H

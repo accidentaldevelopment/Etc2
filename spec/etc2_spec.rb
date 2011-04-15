@@ -23,6 +23,15 @@ describe Etc2 do
       result   = 's1DxyEuMylla6'
       Etc2.crypt(txt,salt).should == result
     end
+    
+    it "should autogenerate a salt if one isn't provided" do
+      lambda{ Etc2.crypt('testpw') }.should_not raise_error
+    end
+    
+    it 'should have two different hashes even when generated in rapid succession' do
+      Etc2.crypt('testpw').should_not == Etc2.crypt('testpw')
+    end
+  
   if RUBY_PLATFORM =~ /linux/
     let(:text){ 'this is a test' }
     let(:salt){ 'saltystring'}
