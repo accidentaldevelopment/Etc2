@@ -1,9 +1,10 @@
 #include "utils.h"
 #include "etc2.h"
  
-char* generate_salt() {
-	#define size 12
-	char salt[size];
+void generate_salt(char *salt) {
+	// #define size 12
+	// char salt[size];
+	int size = (int)sizeof(salt);
 	int i;
 	unsigned int seed;
 	char itoa64_s[] = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -24,10 +25,10 @@ char* generate_salt() {
 	for(i=0; i<size; i++)
 	  salt[i] = itoa64_s[rand() & 0x3f];
 
-	char *final_salt = malloc(size*sizeof(*final_salt));
+	// char *final_salt = malloc(size*sizeof(*final_salt));
 
 	// return salt;
 	// strcpy(final_salt, "$1$");
-	strcat(final_salt, salt);
-	return final_salt;
+	// strcat(final_salt, salt);
+	// return final_salt;
 }

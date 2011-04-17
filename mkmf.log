@@ -1,0 +1,26 @@
+have_macro: checking for __GLIBC__... -------------------- no
+
+"gcc -o conftest -I/Users/brian/.rvm/rubies/ruby-1.9.2-p180/include/ruby-1.9.1/x86_64-darwin10.6.0 -I/Users/brian/.rvm/rubies/ruby-1.9.2-p180/include/ruby-1.9.1/ruby/backward -I/Users/brian/.rvm/rubies/ruby-1.9.2-p180/include/ruby-1.9.1 -I. -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE   -isysroot /Developer/SDKs/MacOSX10.6.sdk -arch x86_64 -fno-common -pipe conftest.c  -L. -L/Users/brian/.rvm/rubies/ruby-1.9.2-p180/lib -L. -Wl,-syslibroot /Developer/SDKs/MacOSX10.6.sdk -arch x86_64 -L/usr/local/lib     -lruby.1.9.1-static  -lpthread -ldl -lobjc "
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: int main() {return 0;}
+/* end */
+
+"gcc -I/Users/brian/.rvm/rubies/ruby-1.9.2-p180/include/ruby-1.9.1/x86_64-darwin10.6.0 -I/Users/brian/.rvm/rubies/ruby-1.9.2-p180/include/ruby-1.9.1/ruby/backward -I/Users/brian/.rvm/rubies/ruby-1.9.2-p180/include/ruby-1.9.1 -I. -D_XOPEN_SOURCE -D_DARWIN_C_SOURCE   -isysroot /Developer/SDKs/MacOSX10.6.sdk -arch x86_64 -fno-common -pipe   -c conftest.c"
+conftest.c:5:3: error: #error 
+conftest.c:6: error: expected identifier or ‘(’ before ‘>>’ token
+checked program was:
+/* begin */
+1: #include "ruby.h"
+2: 
+3: /*top*/
+4: #ifndef __GLIBC__
+5: # error
+6: >>>>>> __GLIBC__ undefined <<<<<<
+7: #endif
+/* end */
+
+--------------------
+

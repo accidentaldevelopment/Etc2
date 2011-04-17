@@ -40,7 +40,8 @@ static VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
 	rb_scan_args(argc, argv, "11", &txt, &salt);
 	
 	if(NIL_P(salt)) {
-		char *gen_salt = generate_salt();
+		char gen_salt[12];
+		generate_salt(gen_salt);
 		result = crypt(STR2CSTR(txt), gen_salt);
 	} else
 		result = crypt(STR2CSTR(txt), STR2CSTR(salt));
