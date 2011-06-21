@@ -31,6 +31,26 @@ describe Etc2 do
     it 'should have two different hashes even when generated in rapid succession' do
       Etc2.crypt('testpw').should_not == Etc2.crypt('testpw')
     end
+    
+    context 'second argument as a hash' do
+      it "should raise an ArgumentError if it's not a String or Hash" do
+        lambda{ Etc2.crypt('blah', 3) }.should raise_error(ArgumentError)
+      end
+      
+      it 'should take :salt as a key' do
+        txt,salt = 'this is a test', 's1'
+        result   = 's1DxyEuMylla6'
+        Etc2.crypt(txt, :salt => salt).should == result
+      end
+    
+    if RUBY_PLATFORM =~ /darwin/
+      it 'should raise NotImplementedError if :type is passed' do
+        lambda{ Etc2.crypt('asf', :type => :blah) }.should raise_error(NotImplementedError)
+      end
+    else
+      #nothing
+    end
+    end
   
   if RUBY_PLATFORM =~ /linux/
     let(:text){ 'this is a test' }

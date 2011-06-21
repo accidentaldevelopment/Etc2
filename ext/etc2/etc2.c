@@ -43,8 +43,18 @@ static VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
 		char gen_salt[12];
 		generate_salt(gen_salt);
 		result = crypt(STR2CSTR(txt), gen_salt);
-	} else
-		result = crypt(STR2CSTR(txt), STR2CSTR(salt));
+	} else {
+		switch(TYPE(salt)) {
+			case T_STRING:
+				result = crypt(STR2CSTR(txt), STR2CSTR(salt));
+				break;
+			case T_HASH:
+				result = crypt_with_hash(txt, salt);
+				break;
+			default:
+				rb_raise(rb_eArgError, "String or Hash expected");
+		}
+	}
 	
 	return CSTR2STR(result);
 }
@@ -132,8 +142,9 @@ static VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	}
 	
 	VALUE mem_ary = rb_ary_new();
-	for(g->gr_mem; *g->gr_mem; *g->gr_mem++)
-		rb_ary_push(mem_ary, CSTR2STR(*g->gr_mem));
+	struct group *grp = g;
+	for(grp->gr_mem; *grp->gr_mem; *grp->gr_mem++)
+		rb_ary_push(mem_ary, CSTR2STR(*grp->gr_mem));
 	
 	rb_iv_set(obj, "@name",   CSTR2STR(g->gr_name));
 	rb_iv_set(obj, "@passwd", CSTR2STR(g->gr_passwd));

@@ -1,7 +1,8 @@
 #include "ruby.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
+
+#define ETC2_H
 
 #define VERSION rb_tainted_str_new2("1.0.0")
 
