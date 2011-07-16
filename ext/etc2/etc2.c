@@ -142,9 +142,9 @@ static VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	}
 	
 	VALUE mem_ary = rb_ary_new();
-	struct group *grp = g;
-	for(grp->gr_mem; *grp->gr_mem; *grp->gr_mem++)
-		rb_ary_push(mem_ary, CSTR2STR(*grp->gr_mem));
+	char **mem;
+	for(mem=g->gr_mem; *mem; mem++)
+		rb_ary_push(mem_ary, CSTR2STR(*mem));
 	
 	rb_iv_set(obj, "@name",   CSTR2STR(g->gr_name));
 	rb_iv_set(obj, "@passwd", CSTR2STR(g->gr_passwd));

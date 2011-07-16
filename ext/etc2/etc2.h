@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifndef ETC2_H
 #define ETC2_H 1
 
+/* Version of library */
 #define VERSION rb_tainted_str_new2("1.0.0")
 
 #define CSTR2STR(cstr) rb_tainted_str_new2(cstr)
@@ -49,3 +51,5 @@ static VALUE rb_cShadow_find(VALUE, VALUE);
 static VALUE rb_cShadow_init(VALUE);
 
 #endif /* HAVE_SHADOW_H */
+
+#endif /* ETC2_H */
