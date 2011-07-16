@@ -1,7 +1,7 @@
 *.swp
+*.o
+*.bundle
+*.log
 pkg
-doc/*
-/ext/etc2/*.o
-/ext/etc2/*.bundle
-/ext/etc2/*.log
-/ext/etc2/Makefile
+tmp
+doc

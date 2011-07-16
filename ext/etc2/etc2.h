@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define ETC2_H
+#define ETC2_H 1
 
 #define VERSION rb_tainted_str_new2("1.0.0")
 
