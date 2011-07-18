@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "etc2.h"
 
 // Points the parameter at a randomly generated salt 
 void generate_salt(char salt[]) {

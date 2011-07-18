@@ -1,10 +1,9 @@
 #include "etc2.h"
-#include "utils.h"
 
 /*
  * Returns true if support for shadow.h was included
  */
-static VALUE rb_mEtc2_hasShadow(VALUE mod) {
+VALUE rb_mEtc2_hasShadow(VALUE mod) {
 #ifdef HAVE_SHADOW_H
 	return Qtrue;
 #else
@@ -33,7 +32,7 @@ static VALUE rb_mEtc2_hasShadow(VALUE mod) {
  * - $5$saltsalt$ SHA256
  * - $6$saltsalt$ SHA512
  */
-static VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
+VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
 #ifndef HAVE_CRYPT
 	rb_notimplement();
 	return Qnil;
@@ -72,7 +71,7 @@ static VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
  * @return [User]    A user object or nil if one couldn't be found
  * @raise  [ArgumentError] If the username or uid can't be found
  */
-static VALUE rb_cUser_find(VALUE mod, VALUE user_lookup) {
+VALUE rb_cUser_find(VALUE mod, VALUE user_lookup) {
 	VALUE obj = rb_class_new_instance(0, NULL, rb_cUser); //rb_funcall(rb_cUser, NEW, 0);
 	struct passwd *p;
 	if(TYPE(user_lookup) == T_STRING) {
@@ -103,7 +102,7 @@ static VALUE rb_cUser_find(VALUE mod, VALUE user_lookup) {
  *
  * @return [User] A User object for the current user
  */
-static VALUE rb_cUser_current(VALUE mod) {
+VALUE rb_cUser_current(VALUE mod) {
 #ifdef HAVE_GETLOGIN
 	return rb_cUser_find(mod, CSTR2STR(getlogin()));
 #else
@@ -111,7 +110,7 @@ static VALUE rb_cUser_current(VALUE mod) {
 #endif
 }
 
-static VALUE rb_cUser_init(VALUE self) {
+VALUE rb_cUser_init(VALUE self) {
 	user_attr("name", 1, 0);
 	user_attr("passwd", 1, 0);
 	user_attr("uid", 1, 0);
@@ -127,7 +126,7 @@ static VALUE rb_cUser_init(VALUE self) {
 	return Qtrue;
 }
 
-static VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
+VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	VALUE obj = rb_class_new_instance(0, NULL, rb_cGroup);
 	struct group *g;
 	if(TYPE(group_lookup) == T_STRING) {
@@ -153,7 +152,7 @@ static VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	return obj;
 }
 
-static VALUE rb_cGroup_init(VALUE self) {
+VALUE rb_cGroup_init(VALUE self) {
 	group_attr("name", 1, 0);
 	group_attr("passwd", 1, 0);
 	group_attr("gid", 1, 0);
@@ -161,7 +160,7 @@ static VALUE rb_cGroup_init(VALUE self) {
 	return Qtrue;
 }
 
-static VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
+VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 #ifndef HAVE_SHADOW_H
 	rb_raise(rb_eNotImpError, "shadow not available on this platform");
 	return Qnil;
@@ -179,7 +178,7 @@ static VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 #endif
 }
 
-static VALUE rb_cShadow_init(VALUE self){
+VALUE rb_cShadow_init(VALUE self){
 #ifndef HAVE_SHADOW_H
 	rb_raise(rb_eNotImpError, "shadow not available on this platform");
 	return Qnil;
