@@ -9,7 +9,11 @@ describe Etc2 do
     # Classes dependent on platform
     case RUBY_PLATFORM
     when /darwin/ then
-      it('should not include a Shadow class') { Etc2.constants.include?(:Shadow).should_not be_true }
+      it('should raise NotImplementedError when trying to access shadow') do
+        lambda{ Etc2::Shadow.find('bfaga') }.should raise_error(NotImplementedError, /shadow not available on this platform/)
+        lambda{ Etc2::Shadow.new }.should raise_error(NotImplementedError, /shadow not available on this platform/)
+      end
+      
       it('should return false for has_shadow?'){ Etc2.has_shadow?.should be_false}
     when /linux/ then
       it('should include a Shadow class') { Etc2.constants.include?(:Shadow).should be_true }

@@ -1,8 +1,6 @@
 #include "utils.h"
  
 void generate_salt(char *salt) {
-	// #define size 12
-	// char salt[size];
 	int size = (int)sizeof(salt);
 	int i;
 	unsigned int seed;
@@ -15,21 +13,13 @@ void generate_salt(char *salt) {
 	  if (read(random, (void*) &seed, size) != size)
 	    close(random);
 	}
-	// Fallback
-	else
+	else  // fallback
 	  seed = time(NULL);
 
 	srand(seed);
 
 	for(i=0; i<size; i++)
 	  salt[i] = itoa64_s[rand() & 0x3f];
-
-	// char *final_salt = malloc(size*sizeof(*final_salt));
-
-	// return salt;
-	// strcpy(final_salt, "$1$");
-	// strcat(final_salt, salt);
-	// return final_salt;
 }
 
 char* crypt_with_hash(VALUE txt, VALUE hash) {

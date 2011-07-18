@@ -12,7 +12,6 @@ static VALUE rb_mEtc2_hasShadow(VALUE mod) {
 #endif
 }
 
-#ifdef HAVE_CRYPT
 /*
  * Document-method: crypt
  * call-seq:
@@ -35,6 +34,10 @@ static VALUE rb_mEtc2_hasShadow(VALUE mod) {
  * - $6$saltsalt$ SHA512
  */
 static VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
+#ifndef HAVE_CRYPT
+	rb_notimplement();
+	return Qnil;
+#else
 	VALUE txt, salt;
 	char *result;
 	rb_scan_args(argc, argv, "11", &txt, &salt);
@@ -57,10 +60,9 @@ static VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
 	}
 	
 	return CSTR2STR(result);
+#endif
 }
-#endif /* HAVE_CRYPT */
 
-#ifdef HAVE_PWD_H
 /*
  * call-seq:
  *   (User) find(lookup)
@@ -124,9 +126,7 @@ static VALUE rb_cUser_init(VALUE self) {
 	rb_define_alias(rb_cUser, "home", "dir");
 	return Qtrue;
 }
-#endif /* HAVE_PWD_H */
 
-#ifdef HAVE_GRP_H
 static VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	VALUE obj = rb_class_new_instance(0, NULL, rb_cGroup);
 	struct group *g;
@@ -160,10 +160,12 @@ static VALUE rb_cGroup_init(VALUE self) {
 	group_attr("mem", 1, 0);
 	return Qtrue;
 }
-#endif /* HAVE_GRP_H */
 
-#ifdef HAVE_SHADOW_H
 static VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
+#ifndef HAVE_SHADOW_H
+	rb_raise(rb_eNotImpError, "shadow not available on this platform");
+	return Qnil;
+#else
 	VALUE obj = rb_class_new_instance(0, NULL, rb_cShadow);
 	struct spwd *s;
 	char *shadowname = STR2CSTR(shadow_lookup);
@@ -174,42 +176,40 @@ static VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 	rb_iv_set(obj, "@name",   CSTR2STR(s->sp_namp));
 	rb_iv_set(obj, "@passwd", CSTR2STR(s->sp_pwdp));
 	return obj;
+#endif
 }
 
 static VALUE rb_cShadow_init(VALUE self){
+#ifndef HAVE_SHADOW_H
+	rb_raise(rb_eNotImpError, "shadow not available on this platform");
+	return Qnil;
+#else
 	shadow_attr("name", 1, 0);
 	shadow_attr("passwd", 1, 0);
 	
 	rb_define_alias(rb_cShadow, "password", "passwd");
 	rb_define_alias(rb_cShadow, "encrypted_password", "passwd");
 	return Qtrue;
+#endif
 }
-#endif /* HAVE_SHADOW_H */
 
 void Init_etc2() {
 	rb_mEtc2 = rb_define_module("Etc2");
 	rb_define_const(rb_mEtc2, "VERSION", VERSION);
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
-#ifdef HAVE_CRYPT
-	rb_define_module_function(rb_mEtc2, "crypt", rb_mEtc2_crypt, -1);
-#endif /* HAVE_CRYPT */
 	
-#ifdef HAVE_PWD_H
+	rb_define_module_function(rb_mEtc2, "crypt", rb_mEtc2_crypt, -1);
+	
 	rb_cUser = rb_define_class_under(rb_mEtc2, "User", rb_cObject);
 	rb_define_module_function(rb_cUser, "find", rb_cUser_find, 1);
 	rb_define_module_function(rb_cUser, "current", rb_cUser_current, 0);
 	rb_define_method(rb_cUser, "initialize", rb_cUser_init, 0);
-#endif /* HAVE_PWD_H */
-
-#ifdef HAVE_GRP_H
+	
 	rb_cGroup = rb_define_class_under(rb_mEtc2, "Group", rb_cObject);
 	rb_define_module_function(rb_cGroup, "find", rb_cGroup_find, 1);
 	rb_define_method(rb_cGroup, "initialize", rb_cGroup_init, 0);
-#endif /* HAVE_GRP_H */
 
-#ifdef HAVE_SHADOW_H
 	rb_cShadow = rb_define_class_under(rb_mEtc2, "Shadow", rb_cObject);
 	rb_define_module_function(rb_cShadow, "find", rb_cShadow_find, 1);
 	rb_define_method(rb_cShadow, "initialize", rb_cShadow_init, 0);
-#endif /* HAVE_SHADOW_H */
 }
