@@ -15,10 +15,22 @@ class Sync < Thor
   def bfaga
     rsync('bfaga@bfaga.tech.ais.msu.edu')
   end
+  
+  desc 'rhel', 'Sync to all rhel systems'
+  def rhel
+    invoke :rhel5
+    invoke :rhel6
+  end
+  
+  desc 'all', 'Sync to all known systems'
+  def all
+    invoke :bfaga
+    invoke :rhel
+  end
 
 private
   def rsync(dest)
-    res = run "rsync -avH --progress ./ #{dest}:etc2/ --exclude=Makefile --exclude=*.bundle --exclude=*.o --exclude=.git 2>&1", :capture => true
+    res = run "rsync -avH --delete --progress ./ #{dest}:etc2/ --exclude=tmp --exclude=.git 2>&1", :capture => true
     if $?.exitstatus == 0
       say_status 'sync', 'Successful', :green
     else
@@ -26,19 +38,4 @@ private
       puts res
     end
   end
-end
-
-class Rhel < Thor::Group
-  desc 'Sync to all rhel servers'
-  
-  invoke :'sync:rhel5'
-  invoke :'sync:rhel6'
-end
-
-class All < Thor::Group
-  desc 'Sync to all servers'
-  
-  invoke :'sync:rhel5'
-  invoke :'sync:rhel6'
-  invoke :'sync:bfaga'
 end

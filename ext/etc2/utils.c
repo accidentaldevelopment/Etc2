@@ -1,6 +1,7 @@
 #include "utils.h"
- 
-void generate_salt(char *salt) {
+
+// Points the parameter at a randomly generated salt 
+void generate_salt(char salt[]) {
 	int size = (int)sizeof(salt);
 	int i;
 	unsigned int seed;
