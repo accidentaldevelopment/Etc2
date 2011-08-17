@@ -2,6 +2,7 @@
 *.o
 *.bundle
 *.log
+.yardoc/*
 pkg
 tmp
 doc

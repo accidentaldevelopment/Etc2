@@ -12,12 +12,14 @@ VALUE rb_mEtc2_hasShadow(VALUE mod) {
 }
 
 /*
- * Document-method: crypt
- * call-seq:
- *   Etc2.crypt(key, salt) -> encrypted_string
+ * @overload Etc2.crypt(key)
+ *	@param [String] key Text to encrypt
+ *	@return [String] +key+ encrypted with a random salt
+ * @overload Etc2.crypt(key, salt)
+ * 	@param [String] key Text to encrypt
+ * 	@param [string] salt The salt used for the hash
+ * 	@return [String] +key+ encrypted with +salt+
  *
- * Returns +key+ encrypted with +salt+
- * 
  * Default encryption type is DES.
  *
  * == Encryption Algorithm
@@ -126,6 +128,15 @@ VALUE rb_cUser_init(VALUE self) {
 	return Qtrue;
 }
 
+/*
+ * call-seq:
+ *   (Group) find(lookup)
+ * Find a group based on the groupname or GID
+ *
+ * @param  [String,Fixnum] lookup The groupname or GID to search for
+ * @return [Group]    A group object or nil if one couldn't be found
+ * @raise  [ArgumentError] If the groupname or gid can't be found
+ */
 VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	VALUE obj = rb_class_new_instance(0, NULL, rb_cGroup);
 	struct group *g;
@@ -160,6 +171,15 @@ VALUE rb_cGroup_init(VALUE self) {
 	return Qtrue;
 }
 
+/*
+ * call-seq:
+ *   (Shadow) find(lookup)
+ * Find a user's shadow entry based on the username
+ *
+ * @param  [String] lookup The username to search for
+ * @return [Shadow]    A shadow object or nil if one couldn't be found
+ * @raise  [ArgumentError] If the username can't be found
+ */
 VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 #ifndef HAVE_SHADOW_H
 	rb_raise(rb_eNotImpError, "shadow not available on this platform");
@@ -194,6 +214,7 @@ VALUE rb_cShadow_init(VALUE self){
 
 void Init_etc2() {
 	rb_mEtc2 = rb_define_module("Etc2");
+	// Returns the version of the library
 	rb_define_const(rb_mEtc2, "VERSION", VERSION);
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
 	
