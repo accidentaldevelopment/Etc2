@@ -2,7 +2,7 @@ require 'spec_helper'
 
 if Etc2.has_shadow?
   describe Etc2::Shadow do
-    if Process.uid == 0
+    context 'as root', :if => root? do
       # root specs
     	context 'finding Shadow entries' do
         it 'should find root from the username' do
@@ -29,9 +29,9 @@ if Etc2.has_shadow?
           etc2_shadow.encrypted_password.should == etc2_shadow.passwd
         end
       end
+    end
     
-    else
-      # Non-root specs
+    context 'as non-root', :unless => root? do
       context 'Using Shadow as non-root' do
         it 'should raise a permissions error' do
           lambda{ Etc2::Shadow.find('root') }.should raise_error(Errno::EACCES, 'Permission denied - Must be root to access shadow database')

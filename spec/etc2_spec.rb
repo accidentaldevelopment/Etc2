@@ -6,16 +6,16 @@ describe Etc2 do
     it('should include a User class') { Etc2.constants.include?(:User).should be_true }
     it('should include a Group class') { Etc2.constants.include?(:Group).should be_true }
     
-    # Classes dependent on platform
-    case RUBY_PLATFORM
-    when /darwin/ then
+    context 'libshadow on Darwin', :if => darwin? do
       it('should raise NotImplementedError when trying to access shadow') do
         lambda{ Etc2::Shadow.find('bfaga') }.should raise_error(NotImplementedError, /shadow not available on this platform/)
         lambda{ Etc2::Shadow.new }.should raise_error(NotImplementedError, /shadow not available on this platform/)
       end
       
       it('should return false for has_shadow?'){ Etc2.has_shadow?.should be_false}
-    when /linux/ then
+    end
+    
+    context 'libshadow on Linux', :if => linux? do
       it('should include a Shadow class') { Etc2.constants.include?(:Shadow).should be_true }
       it('should return true for has_shadow?'){ Etc2.has_shadow?.should be_true}
     end
@@ -46,32 +46,24 @@ describe Etc2 do
         result   = 's1DxyEuMylla6'
         Etc2.crypt(txt, :salt => salt).should == result
       end
-    
-    if RUBY_PLATFORM =~ /darwin/
-      it 'should raise NotImplementedError if :type is passed' do
-        lambda{ Etc2.crypt('asf', :type => :blah) }.should raise_error(NotImplementedError)
-      end
-    else
-      #nothing
-    end
     end
   
-  if RUBY_PLATFORM =~ /linux/
-    let(:text){ 'this is a test' }
-    let(:salt){ 'saltystring'}
+    context 'with different magic numbers', :if => linux? do
+      let(:text){ 'this is a test' }
+      let(:salt){ 'saltystring'}
     
-    it 'should do MD5 encrypting' do
-      Etc2.crypt(text, '$1$' + salt + '$').should == '$1$saltystr$DDQHJy3Lz/pqQGuF57hbd.'
-    end
+      it 'should do MD5 encrypting' do
+        Etc2.crypt(text, '$1$' + salt + '$').should == '$1$saltystr$DDQHJy3Lz/pqQGuF57hbd.'
+      end
     
-    it 'should do SHA256 encrypting' do
-      Etc2.crypt(text, '$5$' + salt + '$').should == '$5$saltystring$13k9Wc4IgCrmY/S1depNkWHh9eFvy62s7xFlmW8KZ2D'
-    end
+      it 'should do SHA256 encrypting' do
+        Etc2.crypt(text, '$5$' + salt + '$').should == '$5$saltystring$13k9Wc4IgCrmY/S1depNkWHh9eFvy62s7xFlmW8KZ2D'
+      end
     
-    it 'should do SHA512 encrypting' do
-      Etc2.crypt(text, '$6$' + salt + '$').should == '$6$saltystring$9hcyNJduz/BgCm1tNClS/jv7Xc7VhZ1DJSZk5wXsfB/X/aLI6MSq2c3wS0e.uynaY2VvWUXU55JBVzhSTM4o70'
+      it 'should do SHA512 encrypting' do
+        Etc2.crypt(text, '$6$' + salt + '$').should == '$6$saltystring$9hcyNJduz/BgCm1tNClS/jv7Xc7VhZ1DJSZk5wXsfB/X/aLI6MSq2c3wS0e.uynaY2VvWUXU55JBVzhSTM4o70'
+      end
     end
-  end
   
   end
 end

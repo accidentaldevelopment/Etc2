@@ -2,39 +2,43 @@ require 'spec_helper'
 
 describe Etc2::User do
 	
-	context 'finding users' do
-    it 'should find root from the username' do
-      Etc2::User.find('root').name.should == 'root'
+	context '#find' do
+	  context 'by username' do
+      it 'should find root from the username' do
+        Etc2::User.find('root').name.should == 'root'
+      end
+      
+      it "should raise an ArgumentError if the user cant' be found" do
+        user = 'fake'
+        lambda{ Etc2::User.find(user) }.should raise_error(ArgumentError, "User not found with username: #{user}")
+      end
     end
     
-    it 'should find root from the uid' do
-      Etc2::User.find(0).name.should == 'root'
-    end
+    context 'by uid' do
+      it 'should find root from the uid' do
+        Etc2::User.find(0).name.should == 'root'
+      end
     
-    it "should raise an argument error if the user can't be found" do
-      user = 'fake'
-      lambda{ Etc2::User.find(user) }.should raise_error(ArgumentError, "User not found with username: #{user}")
-      uid = -1
-      lambda{ Etc2::User.find(uid) }.should raise_error(ArgumentError, "User not found with uid: #{uid}")
+      it "should raise an ArgumentError if the user can't be found" do
+        uid = -1
+        lambda{ Etc2::User.find(uid) }.should raise_error(ArgumentError, "User not found with uid: #{uid}")
+      end
     end
   end
- 
-  # Only run if not root
-  unless Process.uid == 0
-    context '#current_user' do
-      before(:all){ @user = Etc2::User.current }
-    
-      it 'should return the correct current user' do
-        @user.name.should == ENV['USER']
-      end
-    
-      it 'should have the correct homedir' do
-        @user.dir.should == ENV['HOME']
-      end
-    
-      it 'should have the right UID' do
-        @user.uid.should == `id -u`.to_i
-      end
+
+  context '#current_user' do
+    before(:all){ @user = Etc2::User.current }
+  
+    it 'should return the correct current user' do
+      @user.name.should == Etc.getlogin
+    end
+  
+    it 'should have the correct homedir' do
+      @user.dir.should == Etc.getpwnam(Etc.getlogin).dir
+    end
+  
+    it 'should have the right UID' do
+      @user.uid.should == Etc.getpwnam(Etc.getlogin).uid
     end
   end
 
