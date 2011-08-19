@@ -19,6 +19,25 @@ describe Etc2::Group do
     end
   end
 
+  context 'getgrent and endgrent' do
+    after(:each){ Etc2::Group.endgrent }
+    
+    it 'should return a valid Group object' do
+      Etc2::Group.getgrent.class.should == Etc2::Group
+    end
+    
+    it 'should respond to endgrent' do
+      lambda{ Etc2::Group.endgrent }.should_not raise_error
+      Etc2::Group.endgrent.should == nil
+    end
+    
+    it 'setgrent should reset grent' do
+      group = Etc2::Group.getgrent
+      Etc2::Group.setgrent
+      group.should == Etc2::Group.getgrent
+    end
+  end
+
   context 'information correctness' do
     let(:etc_group) { Etc.getgrnam('wheel') }
     let(:etc2_group){ Etc2::Group.find('wheel')  }

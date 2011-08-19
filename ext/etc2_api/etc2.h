@@ -17,13 +17,6 @@
 // Convert a Ruby String into a C char array
 #define STR2CSTR(str) StringValueCStr(str)
 
-// Utility constants for Etc2.crypt()
-#define SYM_MD5     ID2SYM(rb_intern("md5"))
-#define SYM_SHA256  ID2SYM(rb_intern("sha256"))
-#define SYM_SHA512  ID2SYM(rb_intern("sha512"))
-#define SYM_SALT    ID2SYM(rb_intern("salt"))
-#define SYM_TYPE    ID2SYM(rb_intern("type"))
-
 // Utility functions for Etc2.crypt()
 void generate_salt(char*);
 
@@ -37,20 +30,32 @@ static VALUE rb_cShadow;
 VALUE rb_mEtc2_hasShadow(VALUE);
 VALUE rb_mEtc2_c_crypt(int, VALUE *, VALUE);
 
+// User declarations
 #define user_attr(name,r,w) rb_define_attr(rb_cUser, name, r, w)
 
 VALUE rb_cUser_find(VALUE, VALUE);
 VALUE rb_cUser_current(VALUE);
 VALUE rb_cUser_init(VALUE);
+VALUE rb_cUser_getpwent(VALUE);
+VALUE rb_cUser_setpwent(VALUE);
+VALUE rb_cUser_endpwent(VALUE);
 
+// Group declarations
 #define group_attr(name,r,w) rb_define_attr(rb_cGroup, name, r, w)
 
 VALUE rb_cGroup_find(VALUE, VALUE);
 VALUE rb_cGroup_init(VALUE);
+VALUE rb_cGroup_getgrent(VALUE);
+VALUE rb_cGroup_setgrent(VALUE);
+VALUE rb_cGroup_endgrent(VALUE);
 
+// Shadow declarations
 #define shadow_attr(name,r,w) rb_define_attr(rb_cShadow, name, r, w)
 
 VALUE rb_cShadow_find(VALUE, VALUE);
 VALUE rb_cShadow_init(VALUE);
+VALUE rb_cShadow_getspent(VALUE);
+VALUE rb_cShadow_setspent(VALUE);
+VALUE rb_cShadow_endspent(VALUE);
 
 #endif //ETC2_H

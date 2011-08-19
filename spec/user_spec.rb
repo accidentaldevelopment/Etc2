@@ -25,6 +25,31 @@ describe Etc2::User do
       end
     end
   end
+  
+  context 'Enumerable' do
+    it 'should respond to #each' do
+      Etc2::User.should respond_to(:each)
+    end
+  end
+  
+  context 'getpwent and endpwent' do
+    after(:each){ Etc2::User.endpwent }
+    
+    it 'should return a valid User object' do
+      Etc2::User.getpwent.class.should == Etc2::User
+    end
+    
+    it 'should respond to endpwent' do
+      lambda{ Etc2::User.endpwent }.should_not raise_error
+      Etc2::User.endpwent.should == nil
+    end
+    
+    it 'setpwent should reset pwent' do
+      user = Etc2::User.getpwent
+      Etc2::User.setpwent
+      user.should == Etc2::User.getpwent
+    end
+  end
 
   context '#current_user' do
     before(:all){ @user = Etc2::User.current }
@@ -50,6 +75,10 @@ describe Etc2::User do
     
     it 'should have the correct username' do
       @etc2_user.name.should == @etc_user.name
+    end
+    
+    it 'should not have a passwd field' do
+      lambda{ @etc2_user.passwd }.should raise_error(NoMethodError)
     end
     
     it 'should have the right uid' do

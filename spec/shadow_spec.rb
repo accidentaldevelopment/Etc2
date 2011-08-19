@@ -29,6 +29,25 @@ if Etc2.has_shadow?
           etc2_shadow.encrypted_password.should == etc2_shadow.passwd
         end
       end
+      
+      context 'getspent and endspent' do
+        after(:each){ Etc2::Shadow.endspent }
+
+        it 'should return a valid Group object' do
+          Etc2::Shadow.getspent.class.should == Etc2::Shadow
+        end
+
+        it 'should respond to endgrent' do
+          lambda{ Etc2::Shadow.endspent }.should_not raise_error
+          Etc2::Shadow.endspent.should == nil
+        end
+
+        it 'setgrent should reset grent' do
+          shadow = Etc2::Shadow.getspent
+          Etc2::Shadow.setspent
+          shadow.should == Etc2::Shadow.getspent
+        end
+      end
     end
     
     context 'as non-root', :unless => root? do
