@@ -37,10 +37,6 @@ describe Etc2 do
     end
     
     context 'second argument as a hash' do
-      it "should raise an ArgumentError if it's not a String or Hash" do
-        lambda{ Etc2.crypt('blah', 3) }.should raise_error(ArgumentError)
-      end
-      
       it 'should take :salt as a key' do
         txt,salt = 'this is a test', 's1'
         result   = 's1DxyEuMylla6'
@@ -53,15 +49,15 @@ describe Etc2 do
       let(:salt){ 'saltystring'}
     
       it 'should do MD5 encrypting' do
-        Etc2.crypt(text, '$1$' + salt + '$').should == '$1$saltystr$DDQHJy3Lz/pqQGuF57hbd.'
+        Etc2.c_crypt(text, '$1$' + salt + '$').should == '$1$saltystr$DDQHJy3Lz/pqQGuF57hbd.'
       end
     
       it 'should do SHA256 encrypting' do
-        Etc2.crypt(text, '$5$' + salt + '$').should == '$5$saltystring$13k9Wc4IgCrmY/S1depNkWHh9eFvy62s7xFlmW8KZ2D'
+        Etc2.c_crypt(text, '$5$' + salt + '$').should == '$5$saltystring$13k9Wc4IgCrmY/S1depNkWHh9eFvy62s7xFlmW8KZ2D'
       end
     
       it 'should do SHA512 encrypting' do
-        Etc2.crypt(text, '$6$' + salt + '$').should == '$6$saltystring$9hcyNJduz/BgCm1tNClS/jv7Xc7VhZ1DJSZk5wXsfB/X/aLI6MSq2c3wS0e.uynaY2VvWUXU55JBVzhSTM4o70'
+        Etc2.c_crypt(text, '$6$' + salt + '$').should == '$6$saltystring$9hcyNJduz/BgCm1tNClS/jv7Xc7VhZ1DJSZk5wXsfB/X/aLI6MSq2c3wS0e.uynaY2VvWUXU55JBVzhSTM4o70'
       end
     end
   

@@ -7,5 +7,5 @@ if have_header('pwd.h') && have_header('grp.h')
   
   # $CFLAGS << ' -Wall -std=c99'
   $CFLAGS << ' -Wall'
-  create_makefile 'etc2'
+  create_makefile 'etc2_api'
 end

@@ -12,9 +12,6 @@
 #ifndef ETC2_H
 #define ETC2_H 1
 
-// Version of library
-#define VERSION rb_tainted_str_new2("1.0.0")
-
 // Convert a C char array into a tainted Ruby String.  Source is external so it should be tainted
 #define CSTR2STR(cstr) rb_tainted_str_new2(cstr)
 // Convert a Ruby String into a C char array
@@ -29,7 +26,6 @@
 
 // Utility functions for Etc2.crypt()
 void generate_salt(char*);
-char* crypt_with_hash(VALUE,VALUE);
 
 // Declarations for module Etc2 and nested classes
 static VALUE rb_mEtc2;
@@ -39,7 +35,7 @@ static VALUE rb_cShadow;
 
 // Etc2 module functions
 VALUE rb_mEtc2_hasShadow(VALUE);
-VALUE rb_mEtc2_crypt(int, VALUE *, VALUE);
+VALUE rb_mEtc2_c_crypt(int, VALUE *, VALUE);
 
 #define user_attr(name,r,w) rb_define_attr(rb_cUser, name, r, w)
 

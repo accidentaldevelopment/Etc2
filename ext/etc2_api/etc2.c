@@ -11,11 +11,11 @@ VALUE rb_mEtc2_hasShadow(VALUE mod) {
 #endif
 }
 
-/*
- * @overload Etc2.crypt(key)
+/* @private
+ * @overload Etc2.c_crypt(key)
  *	@param [String] key Text to encrypt
  *	@return [String] +key+ encrypted with a random salt
- * @overload Etc2.crypt(key, salt)
+ * @overload Etc2.c_crypt(key, salt)
  * 	@param [String] key Text to encrypt
  * 	@param [string] salt The salt used for the hash
  * 	@return [String] +key+ encrypted with +salt+
@@ -34,7 +34,7 @@ VALUE rb_mEtc2_hasShadow(VALUE mod) {
  * - $5$saltsalt$ SHA256
  * - $6$saltsalt$ SHA512
  */
-VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
+VALUE rb_mEtc2_c_crypt(int argc, VALUE *argv, VALUE mod) {
 #ifndef HAVE_CRYPT
 	rb_notimplement();
 	return Qnil;
@@ -52,9 +52,9 @@ VALUE rb_mEtc2_crypt(int argc, VALUE *argv, VALUE mod) {
 			case T_STRING:
 				result = crypt(STR2CSTR(txt), STR2CSTR(salt));
 				break;
-			case T_HASH:
-				result = crypt_with_hash(txt, salt);
-				break;
+			// case T_HASH:
+			// 	result = crypt_with_hash(txt, salt);
+			// 	break;
 			default:
 				rb_raise(rb_eArgError, "String or Hash expected");
 		}
@@ -212,13 +212,12 @@ VALUE rb_cShadow_init(VALUE self){
 #endif
 }
 
-void Init_etc2() {
+void Init_etc2_api() {
 	rb_mEtc2 = rb_define_module("Etc2");
 	// Returns the version of the library
-	rb_define_const(rb_mEtc2, "VERSION", VERSION);
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
 	
-	rb_define_module_function(rb_mEtc2, "crypt", rb_mEtc2_crypt, -1);
+	rb_define_module_function(rb_mEtc2, "c_crypt", rb_mEtc2_c_crypt, -1);
 	
 	rb_cUser = rb_define_class_under(rb_mEtc2, "User", rb_cObject);
 	rb_define_module_function(rb_cUser, "find", rb_cUser_find, 1);
