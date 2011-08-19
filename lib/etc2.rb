@@ -1,5 +1,7 @@
 require File.expand_path('../etc2_api', __FILE__)
 
+# Functional equivalent of Ruby's builtin Etc library.  But I'm hoping to make this one a little more Ruby-like.
+# Uses objects instead of Structs, and includes libshadow support.
 module Etc2
   # The version of the library
   VERSION = '1.0.0'
