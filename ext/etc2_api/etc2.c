@@ -276,9 +276,7 @@ VALUE rb_cShadow_endspent(VALUE self) {
 
 void Init_etc2_api() {
 	rb_mEtc2 = rb_define_module("Etc2");
-	// Returns the version of the library
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
-	
 	rb_define_module_function(rb_mEtc2, "c_crypt", rb_mEtc2_c_crypt, -1);
 	
 	rb_cUser = rb_define_class_under(rb_mEtc2, "User", rb_cObject);

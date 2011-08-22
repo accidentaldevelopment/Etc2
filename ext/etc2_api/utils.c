@@ -1,4 +1,7 @@
-#include "etc2.h"
+#include <unistd.h>
+#include <time.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
 // Points the parameter at a randomly generated salt 
 void generate_salt(char salt[]) {

@@ -21,10 +21,10 @@
 void generate_salt(char*);
 
 // Declarations for module Etc2 and nested classes
-static VALUE rb_mEtc2;
-static VALUE rb_cUser;
-static VALUE rb_cGroup;
-static VALUE rb_cShadow;
+VALUE rb_mEtc2;
+VALUE rb_cUser;
+VALUE rb_cGroup;
+VALUE rb_cShadow;
 
 // Etc2 module functions
 VALUE rb_mEtc2_hasShadow(VALUE);
