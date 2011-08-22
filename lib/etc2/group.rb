@@ -15,6 +15,9 @@ module Etc2
       end
     end
     
+    # Iterate through each Group on the system
+    # @yield [group] Executes the block for each group
+    # @yieldparam group The Group object
     def self.each
       setgrent
       group, groups = nil, []

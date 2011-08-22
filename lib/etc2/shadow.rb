@@ -12,12 +12,16 @@ module Etc2
     def initialize
       raise NotImplementedError.new('shadow not available on this platform') unless Etc2.has_shadow?
     end
-    
+
+if Etc2.has_shadow?  
     # @return [User] The User object that own this shadow entry
     def user
       Etc2::User.find(self.name)
     end
     
+    # Iterate through each Shadow on the system
+    # @yield [shadow] Executes the block for each shadow entry
+    # @yieldparam shadow The Shadow object
     def self.each
       setspent
       shadow, shadows = nil, []
@@ -28,4 +32,5 @@ module Etc2
       shadows
     end
   end
+end
 end
