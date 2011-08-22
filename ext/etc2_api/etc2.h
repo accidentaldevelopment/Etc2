@@ -1,9 +1,9 @@
 #include "ruby.h"
 #include <unistd.h>
-// Existence of these headers is verified by extconf.rb
 #include <pwd.h>
 #include <grp.h>
 #include <fcntl.h>
+#include <time.h>
 
 #ifdef HAVE_SHADOW_H
 #include <shadow.h>
@@ -35,7 +35,6 @@ VALUE rb_mEtc2_c_crypt(int, VALUE *, VALUE);
 
 VALUE rb_cUser_find(VALUE, VALUE);
 VALUE rb_cUser_current(VALUE);
-VALUE rb_cUser_init(VALUE);
 VALUE rb_cUser_getpwent(VALUE);
 VALUE rb_cUser_setpwent(VALUE);
 VALUE rb_cUser_endpwent(VALUE);
@@ -44,7 +43,6 @@ VALUE rb_cUser_endpwent(VALUE);
 #define group_attr(name,r,w) rb_define_attr(rb_cGroup, name, r, w)
 
 VALUE rb_cGroup_find(VALUE, VALUE);
-VALUE rb_cGroup_init(VALUE);
 VALUE rb_cGroup_getgrent(VALUE);
 VALUE rb_cGroup_setgrent(VALUE);
 VALUE rb_cGroup_endgrent(VALUE);
@@ -53,7 +51,6 @@ VALUE rb_cGroup_endgrent(VALUE);
 #define shadow_attr(name,r,w) rb_define_attr(rb_cShadow, name, r, w)
 
 VALUE rb_cShadow_find(VALUE, VALUE);
-VALUE rb_cShadow_init(VALUE);
 VALUE rb_cShadow_getspent(VALUE);
 VALUE rb_cShadow_setspent(VALUE);
 VALUE rb_cShadow_endspent(VALUE);

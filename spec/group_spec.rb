@@ -54,4 +54,16 @@ describe Etc2::Group do
       etc2_group.mem.should == etc_group.mem
     end
   end
+  
+  context 'relationships' do
+    before(:all){ @group = Etc2::Group.find(0) }
+    
+    it 'should respond to #users' do
+      @group.should respond_to :users
+    end
+    
+    it 'should have the right User objects' do
+      @group.users.should include Etc2::User.find(0)
+    end
+  end
 end

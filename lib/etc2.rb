@@ -1,4 +1,8 @@
 require File.expand_path('../etc2_api', __FILE__)
+require File.expand_path('../etc2/common', __FILE__)
+require File.expand_path('../etc2/user', __FILE__)
+require File.expand_path('../etc2/group', __FILE__)
+require File.expand_path('../etc2/shadow', __FILE__)
 
 # Functional equivalent of Ruby's builtin Etc library.  But I'm hoping to make this one a little more Ruby-like.
 # Uses objects instead of Structs, and includes libshadow support.
@@ -32,66 +36,6 @@ module Etc2
       if opts[:salt]
         c_crypt(text, opts[:salt])
       end
-    end
-  end
-  
-  # Mixin of common methods between the Etc2 classes
-  module Common
-    def ==(other)
-      return false unless other.class == self.class
-      self.instance_variables.each do |v|
-        return false unless instance_variable_get(v) == other.instance_variable_get(v)
-      end
-      return true
-    end
-  end
-  
-  # Represents a single user on the system
-  class User
-    include Common
-    extend Enumerable
-    
-    def self.each
-      setpwent
-      user, users = nil, []
-      while(user = getpwent) do
-        yield user if block_given?
-        users << user
-      end
-      users
-    end
-  end
-  
-  # Represents a single group on the system
-  class Group
-    include Common
-    extend Enumerable
-    
-    def self.each
-      setgrent
-      group, groups = nil, []
-      while(group = getgrent) do
-        yield user if block_given?
-        groups << group
-      end
-      groups
-    end
-  end
-  
-  
-  # Represents a shadow (spwd) entry on the system
-  class Shadow
-    include Common
-    extend Enumerable
-    
-    def self.each
-      setspent
-      shadow, shadows = nil, []
-      while(shadow = getspent) do
-        yield shadow if block_given?
-        shadows << shadow
-      end
-      shadows
     end
   end
 end

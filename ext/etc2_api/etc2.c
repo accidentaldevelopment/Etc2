@@ -117,21 +117,6 @@ VALUE rb_cUser_current(VALUE mod) {
 #endif
 }
 
-VALUE rb_cUser_init(VALUE self) {
-	user_attr("name", 1, 0);
-	user_attr("uid", 1, 0);
-	user_attr("gid", 1, 0);
-	user_attr("gecos", 1, 0);
-	user_attr("dir", 1, 0);
-	user_attr("shell", 1, 0);
-
-	rb_define_alias(rb_cUser, "full_name", "gecos");
-	rb_define_alias(rb_cUser, "home_dir", "dir");
-	rb_define_alias(rb_cUser, "homedir", "dir");
-	rb_define_alias(rb_cUser, "home", "dir");
-	return Qtrue;
-}
-
 /* 
  * Same as getpwent(3)
  * @return [User] The next (or first) User object in the database
@@ -226,14 +211,6 @@ VALUE rb_cGroup_endgrent(VALUE self) {
 	return Qnil;
 }
 
-VALUE rb_cGroup_init(VALUE self) {
-	group_attr("name", 1, 0);
-	group_attr("passwd", 1, 0);
-	group_attr("gid", 1, 0);
-	group_attr("mem", 1, 0);
-	return Qtrue;
-}
-
 // Shadow definitions
 VALUE setup_shadow(struct spwd *s) {
 #ifdef HAVE_SHADOW_H
@@ -297,20 +274,6 @@ VALUE rb_cShadow_endspent(VALUE self) {
 	return Qnil;
 }
 
-VALUE rb_cShadow_init(VALUE self){
-#ifndef HAVE_SHADOW_H
-	rb_raise(rb_eNotImpError, "shadow not available on this platform");
-	return Qnil;
-#else
-	shadow_attr("name", 1, 0);
-	shadow_attr("passwd", 1, 0);
-	
-	rb_define_alias(rb_cShadow, "password", "passwd");
-	rb_define_alias(rb_cShadow, "encrypted_password", "passwd");
-	return Qtrue;
-#endif
-}
-
 void Init_etc2_api() {
 	rb_mEtc2 = rb_define_module("Etc2");
 	// Returns the version of the library
@@ -324,19 +287,16 @@ void Init_etc2_api() {
 	rb_define_module_function(rb_cUser, "getpwent", rb_cUser_getpwent, 0);
 	rb_define_module_function(rb_cUser, "setpwent", rb_cUser_setpwent, 0);
 	rb_define_module_function(rb_cUser, "endpwent", rb_cUser_endpwent, 0);
-	rb_define_method(rb_cUser, "initialize", rb_cUser_init, 0);
 	
 	rb_cGroup = rb_define_class_under(rb_mEtc2, "Group", rb_cObject);
 	rb_define_module_function(rb_cGroup, "find", rb_cGroup_find, 1);
 	rb_define_module_function(rb_cGroup, "getgrent", rb_cGroup_getgrent, 0);
 	rb_define_module_function(rb_cGroup, "setgrent", rb_cGroup_setgrent, 0);
 	rb_define_module_function(rb_cGroup, "endgrent", rb_cGroup_endgrent, 0);
-	rb_define_method(rb_cGroup, "initialize", rb_cGroup_init, 0);
 
 	rb_cShadow = rb_define_class_under(rb_mEtc2, "Shadow", rb_cObject);
 	rb_define_module_function(rb_cShadow, "find", rb_cShadow_find, 1);
 	rb_define_module_function(rb_cShadow, "getspent", rb_cShadow_getspent, 0);
 	rb_define_module_function(rb_cShadow, "setspent", rb_cShadow_setspent, 0);
 	rb_define_module_function(rb_cShadow, "endspent", rb_cShadow_endspent, 0);
-	rb_define_method(rb_cShadow, "initialize", rb_cShadow_init, 0);
 }

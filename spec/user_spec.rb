@@ -106,4 +106,19 @@ describe Etc2::User do
       @etc2_user.shell.should == @etc_user.shell
     end
   end
+  
+  context 'relationships' do
+    before(:all){ @user = Etc2::User.find(0) }
+    it 'should have the associated group object' do
+      @user.group.should == Etc2::Group.find(@user.gid)
+    end
+    
+    it 'should have the associated shadow object', :if => shadow? && root? do
+      @user.shadow.should == Etc2::Shadow.find(@user.name)
+    end
+    
+    it 'should not have the shadow method', :unless => shadow? do
+      @user.should_not respond_to :shadow
+    end
+  end
 end

@@ -21,3 +21,8 @@ end
 def root?
   Process.euid == 0 || Process.uid == 0
 end
+
+# @return true if the system includes shadow
+def shadow?
+  Etc2.has_shadow?
+end
