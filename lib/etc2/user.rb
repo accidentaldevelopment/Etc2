@@ -20,7 +20,7 @@ module Etc2
         yield user if block_given?
         users << user
       end
-      users
+      block_given? ? users : Enumerator.new(users)
     end
     
     # @return the Group object for this User's primary group

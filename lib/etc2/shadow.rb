@@ -32,7 +32,7 @@ if Etc2.has_shadow?
         yield shadow if block_given?
         shadows << shadow
       end
-      shadows
+      block_given? ? shadows : Enumerator.new(shadows)
     end
   end
 end

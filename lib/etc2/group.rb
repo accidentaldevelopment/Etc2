@@ -22,10 +22,10 @@ module Etc2
       setgrent
       group, groups = nil, []
       while(group = getgrent) do
-        yield user if block_given?
+        yield group if block_given?
         groups << group
       end
-      groups
+      block_given? ? groups : Enumerator.new(groups)
     end
   end
 end
