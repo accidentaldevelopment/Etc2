@@ -211,6 +211,8 @@ VALUE rb_cGroup_endgrent(VALUE self) {
 	return Qnil;
 }
 
+#ifdef HAVE_SHADOW_H
+
 // Shadow definitions
 VALUE setup_shadow(struct spwd *s) {
 #ifdef HAVE_SHADOW_H
@@ -233,10 +235,6 @@ VALUE setup_shadow(struct spwd *s) {
  * @raise  [ArgumentError] If the username can't be found
  */
 VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
-#ifndef HAVE_SHADOW_H
-	rb_raise(rb_eNotImpError, "shadow not available on this platform");
-	return Qnil;
-#else
 	struct spwd *s;
 	char *shadowname = STR2CSTR(shadow_lookup);
 	s = getspnam(shadowname);
@@ -244,7 +242,6 @@ VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 	else if(s == NULL) rb_raise(rb_eArgError, "Shadow entry not found for username: %s", shadowname);
 	
 	return setup_shadow(s);
-#endif
 }
 
 /* 
@@ -274,6 +271,8 @@ VALUE rb_cShadow_endspent(VALUE self) {
 	return Qnil;
 }
 
+#endif // HAVE_SHADOW_H
+
 void Init_etc2_api() {
 	rb_mEtc2 = rb_define_module("Etc2");
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
@@ -291,10 +290,12 @@ void Init_etc2_api() {
 	rb_define_module_function(rb_cGroup, "getgrent", rb_cGroup_getgrent, 0);
 	rb_define_module_function(rb_cGroup, "setgrent", rb_cGroup_setgrent, 0);
 	rb_define_module_function(rb_cGroup, "endgrent", rb_cGroup_endgrent, 0);
-
+	
+#ifdef HAVE_SHADOW_H
 	rb_cShadow = rb_define_class_under(rb_mEtc2, "Shadow", rb_cObject);
 	rb_define_module_function(rb_cShadow, "find", rb_cShadow_find, 1);
 	rb_define_module_function(rb_cShadow, "getspent", rb_cShadow_getspent, 0);
 	rb_define_module_function(rb_cShadow, "setspent", rb_cShadow_setspent, 0);
 	rb_define_module_function(rb_cShadow, "endspent", rb_cShadow_endspent, 0);
+#endif
 }

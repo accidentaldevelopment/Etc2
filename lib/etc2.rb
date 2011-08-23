@@ -2,7 +2,11 @@ require File.expand_path('../etc2_api', __FILE__)
 require File.expand_path('../etc2/common', __FILE__)
 require File.expand_path('../etc2/user', __FILE__)
 require File.expand_path('../etc2/group', __FILE__)
+
+# Only require shadow.rb if the system supports it
+if Etc2.has_shadow?
 require File.expand_path('../etc2/shadow', __FILE__)
+end
 
 # Functional equivalent of Ruby's builtin Etc library.  But I'm hoping to make this one a little more Ruby-like.
 # Uses objects instead of Structs, and includes libshadow support.

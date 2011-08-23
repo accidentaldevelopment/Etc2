@@ -1,6 +1,7 @@
 require 'spec_helper'
 
-describe Etc2::Shadow, :if => shadow? do
+if shadow?
+describe Etc2::Shadow do
   context 'as root', :if => root? do
     # root specs
   	context 'finding Shadow entries' do
@@ -67,4 +68,5 @@ describe Etc2::Shadow, :if => shadow? do
       end
     end
   end
+end
 end

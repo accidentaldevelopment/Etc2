@@ -1,5 +1,8 @@
 module Etc2
   # Represents a shadow (spwd) entry on the system
+  # @note 
+  #   This class only exists if shadow was present when the library was compiled.
+  #   It won't be present on platforms like Mac OS X
   class Shadow
     include Common
     extend Enumerable

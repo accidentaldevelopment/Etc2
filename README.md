@@ -5,7 +5,8 @@ This library is a functional clone of Ruby's Etc library, part of the standard l
 Ruby's Etc is basically a very thin layer over the underlying C functions.  Which is fine, but I wanted a more Ruby-esque solution.
 This library uses its own objects instead of Structs, and it includes Shadow support (as long the platform does).
 
-### #crypt
+\#crypt
+---
 Etc2 includes a module_function implementation of crypt().  It basically just calls the system version of the same function.
 
 On systems with GNU it will use that version of crypt, meaning you can select the algorithm by adding a magic number to the beginning of the salt.
@@ -59,7 +60,7 @@ Shadow
 ---
 The Shadow class is where things can get tricky.  Only certain platforms use shadow for encrypting passwords.  Mac OS X, for example, does not use it.
 
-The class exists on all platforms, but will raise NotImplementedError on systems which don't include shadow.h or the associated library.
+The class does not exist on systems that don't include shadow.
 
 The API should be looking pretty familiar at this point:
 

@@ -24,7 +24,9 @@ void generate_salt(char*);
 VALUE rb_mEtc2;
 VALUE rb_cUser;
 VALUE rb_cGroup;
+#ifdef HAVE_SHADOW_H
 VALUE rb_cShadow;
+#endif
 
 // Etc2 module functions
 VALUE rb_mEtc2_hasShadow(VALUE);
@@ -48,11 +50,13 @@ VALUE rb_cGroup_setgrent(VALUE);
 VALUE rb_cGroup_endgrent(VALUE);
 
 // Shadow declarations
+#ifdef HAVE_SHADOW_H
 #define shadow_attr(name,r,w) rb_define_attr(rb_cShadow, name, r, w)
 
 VALUE rb_cShadow_find(VALUE, VALUE);
 VALUE rb_cShadow_getspent(VALUE);
 VALUE rb_cShadow_setspent(VALUE);
 VALUE rb_cShadow_endspent(VALUE);
+#endif 
 
 #endif //ETC2_H
