@@ -8,7 +8,7 @@ describe Etc2 do
     
     context 'libshadow on Darwin', :if => darwin? do
       it('should not exist') do
-        lambda{ Etc2::Shadow.find('bfaga') }.should raise_error(NameError, /uninitialized constant Etc2::Shadow/)
+        lambda{ Etc2::Shadow.find('root') }.should raise_error(NameError, /uninitialized constant Etc2::Shadow/)
       end
       
       it('should return false for has_shadow?'){ Etc2.has_shadow?.should be_false}
