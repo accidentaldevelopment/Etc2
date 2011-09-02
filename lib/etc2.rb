@@ -12,7 +12,7 @@ end
 # Uses objects instead of Structs, and includes libshadow support.
 module Etc2
   # The version of the library
-  VERSION = '1.0.0'
+  VERSION = '0.1.0'
   
   # Generates a libshadow-compatible hash from the supplied data
   #
