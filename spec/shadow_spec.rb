@@ -8,10 +8,14 @@ describe Etc2::Shadow do
       it 'should find root from the username' do
         Etc2::Shadow.find('root').name.should == 'root'
       end
+      
+      it "should return nil if the user can't be found" do
+        Etc2::Shadow.find('fake').should == nil
+      end
   
-      it "should raise an argument error if the user can't be found" do
+      it "should raise an argument error if the user can't be found with bang method" do
         user = 'fake'
-        lambda{ Etc2::Shadow.find(user) }.should raise_error(ArgumentError, "Shadow entry not found for username: #{user}")
+        lambda{ Etc2::Shadow.find!(user) }.should raise_error(ArgumentError, "Shadow entry not found for username: #{user}")
       end
     end
 

@@ -8,9 +8,13 @@ describe Etc2::User do
         Etc2::User.find('root').name.should == 'root'
       end
       
-      it "should raise an ArgumentError if the user cant' be found" do
+      it "should return nil if the user can't be found" do
+        Etc2::User.find('fake').should == nil
+      end
+      
+      it "should raise an ArgumentError if the user can't be found with bang method" do
         user = 'fake'
-        lambda{ Etc2::User.find(user) }.should raise_error(ArgumentError, "User not found with username: #{user}")
+        lambda{ Etc2::User.find!(user) }.should raise_error(ArgumentError, "User not found")
       end
     end
     
@@ -19,9 +23,9 @@ describe Etc2::User do
         Etc2::User.find(0).name.should == 'root'
       end
     
-      it "should raise an ArgumentError if the user can't be found" do
+      it "should raise an ArgumentError if the user can't be found with bang method" do
         uid = -1
-        lambda{ Etc2::User.find(uid) }.should raise_error(ArgumentError, "User not found with uid: #{uid}")
+        lambda{ Etc2::User.find!(uid) }.should raise_error(ArgumentError, "User not found")
       end
     end
   end

@@ -84,22 +84,37 @@ VALUE setup_user(struct passwd *p) {
  *
  * @param  [String,Fixnum] lookup The username or UID to search for
  * @return [User]    A user object or nil if one couldn't be found
- * @raise  [ArgumentError] If the username or uid can't be found
  */
 VALUE rb_cUser_find(VALUE mod, VALUE user_lookup) {
 	struct passwd *p;
 	if(TYPE(user_lookup) == T_STRING) {
 		char *username = STR2CSTR(user_lookup);
 		p = getpwnam(username);
-		if(p == NULL) rb_raise(rb_eArgError, "User not found with username: %s", username);
+		if(p == NULL) return Qnil;
 	}
 	else {
 		uid_t uid = NUM2UIDT(user_lookup);
 		p = getpwuid(uid);
-		if(p == NULL) rb_raise(rb_eArgError, "User not found with uid: %d", uid);
+		if(p == NULL) return Qnil;
 	}
 	
 	return setup_user(p);
+}
+
+/*
+ * call-seq:
+ *   (User) find!(lookup)
+ * Find a user based on the username or UID.  Raises an exception if the user can't be found
+ *
+ * @param  [String,Fixnum] lookup The username or UID to search for
+ * @return [User]    A User object for the supplied UID or username
+ * @raise  [ArgumentError] If the username or uid can't be found
+ */
+VALUE rb_cUser_find_bang(VALUE mod, VALUE user_lookup) {
+	VALUE user = rb_cUser_find(mod, user_lookup);
+	if( user == Qnil)
+		rb_raise(rb_eArgError, "User not found");
+	return user;
 }
 
 /*
@@ -173,15 +188,31 @@ VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	if(TYPE(group_lookup) == T_STRING) {
 		char *groupname = STR2CSTR(group_lookup);
 		g = getgrnam(groupname);
-		if(g == NULL) rb_raise(rb_eArgError, "Group not found with groupname: %s", groupname);
+		if(g == NULL) return Qnil;
 	}
 	else {
 		gid_t gid = NUM2UIDT(group_lookup);
 		g = getgrgid(gid);
-		if(g == NULL) rb_raise(rb_eArgError, "Group not found with gid: %d", gid);
+		if(g == NULL) return Qnil;
 	}
 	
 	return setup_group(g);
+}
+
+/*
+ * call-seq:
+ *   (Group) find!(lookup)
+ * Find a group based on the groupname or GID.  Raises an exception if the group can't be found.
+ *
+ * @param  [String,Fixnum] lookup The groupname or GID to search for
+ * @return [Group]    A Group object for the supplied GID or groupname
+ * @raise  [ArgumentError] If the groupname or gid can't be found
+ */
+VALUE rb_cGroup_find_bang(VALUE mod, VALUE group_lookup) {
+	VALUE group = rb_cGroup_find(mod, group_lookup);
+	if( group == Qnil)
+		rb_raise(rb_eArgError, "Group not found");
+	return group;
 }
 
 /* 
@@ -232,16 +263,31 @@ VALUE setup_shadow(struct spwd *s) {
  *
  * @param  [String] lookup The username to search for
  * @return [Shadow]    A shadow object or nil if one couldn't be found
- * @raise  [ArgumentError] If the username can't be found
  */
 VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 	struct spwd *s;
 	char *shadowname = STR2CSTR(shadow_lookup);
 	s = getspnam(shadowname);
 	if (getuid() != 0 || geteuid() != 0) rb_raise(rb_const_get(rb_mErrno, rb_intern("EACCES")), "Must be root to access shadow database");
-	else if(s == NULL) rb_raise(rb_eArgError, "Shadow entry not found for username: %s", shadowname);
+	else if(s == NULL) return Qnil;
 	
 	return setup_shadow(s);
+}
+
+/*
+ * call-seq:
+ *   (Shadow) find!(lookup)
+ * Find a user's shadow entry based on the username.  Raises an exception if the entry can't be found
+ *
+ * @param  [String] lookup The username to search for
+ * @return [Shadow]    A shadow object or nil if one couldn't be found
+ * @raise  [ArgumentError] If the username can't be found
+ */
+VALUE rb_cShadow_find_bang(VALUE mod, VALUE shadow_lookup) {
+	VALUE shadow = rb_cShadow_find(mod, shadow_lookup);
+	if( shadow == Qnil)
+		rb_raise(rb_eArgError, "Shadow entry not found");
+	return shadow;
 }
 
 /* 
@@ -280,6 +326,7 @@ void Init_etc2_api() {
 	
 	rb_cUser = rb_define_class_under(rb_mEtc2, "User", rb_cObject);
 	rb_define_module_function(rb_cUser, "find", rb_cUser_find, 1);
+	rb_define_module_function(rb_cUser, "find!", rb_cUser_find_bang, 1);
 	rb_define_module_function(rb_cUser, "current", rb_cUser_current, 0);
 	rb_define_module_function(rb_cUser, "getpwent", rb_cUser_getpwent, 0);
 	rb_define_module_function(rb_cUser, "setpwent", rb_cUser_setpwent, 0);
@@ -287,6 +334,7 @@ void Init_etc2_api() {
 	
 	rb_cGroup = rb_define_class_under(rb_mEtc2, "Group", rb_cObject);
 	rb_define_module_function(rb_cGroup, "find", rb_cGroup_find, 1);
+	rb_define_module_function(rb_cGroup, "find!", rb_cGroup_find_bang, 1);
 	rb_define_module_function(rb_cGroup, "getgrent", rb_cGroup_getgrent, 0);
 	rb_define_module_function(rb_cGroup, "setgrent", rb_cGroup_setgrent, 0);
 	rb_define_module_function(rb_cGroup, "endgrent", rb_cGroup_endgrent, 0);
@@ -294,6 +342,7 @@ void Init_etc2_api() {
 #ifdef HAVE_SHADOW_H
 	rb_cShadow = rb_define_class_under(rb_mEtc2, "Shadow", rb_cObject);
 	rb_define_module_function(rb_cShadow, "find", rb_cShadow_find, 1);
+	rb_define_module_function(rb_cShadow, "find!", rb_cShadow_find_bang, 1);
 	rb_define_module_function(rb_cShadow, "getspent", rb_cShadow_getspent, 0);
 	rb_define_module_function(rb_cShadow, "setspent", rb_cShadow_setspent, 0);
 	rb_define_module_function(rb_cShadow, "endspent", rb_cShadow_endspent, 0);

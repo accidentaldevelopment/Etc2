@@ -11,11 +11,16 @@ describe Etc2::Group do
       Etc2::Group.find(0).name.should == Etc.getgrgid(0).name
     end
     
-    it "should raise an argument error if the group can't be found" do
+    it "should return nil if the user can't be found" do
+      Etc2::Group.find('fake').should == nil
+      Etc2::Group.find(-11).should == nil
+    end
+    
+    it "should raise an argument error if the group can't be found with bang method" do
       group = 'fake'
-      lambda{ Etc2::Group.find(group) }.should raise_error(ArgumentError, "Group not found with groupname: #{group}")
+      lambda{ Etc2::Group.find!(group) }.should raise_error(ArgumentError, "Group not found")
       gid = -11
-      lambda{ Etc2::Group.find(gid) }.should raise_error(ArgumentError, "Group not found with gid: #{gid}")
+      lambda{ Etc2::Group.find!(gid) }.should raise_error(ArgumentError, "Group not found")
     end
   end
 
