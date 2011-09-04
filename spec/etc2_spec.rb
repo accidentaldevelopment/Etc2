@@ -20,6 +20,22 @@ describe Etc2 do
     end
   end
   
+  context 'finding from Module level' do
+    it 'should find a user with #user' do
+      Etc2.user('root').name.should == 'root'
+      Etc2.user(0).name.should == 'root'
+    end
+    
+    it 'should find a group with #group' do
+      Etc2.group('wheel').name.should == 'wheel'
+      Etc2.group(0).gid.should == 0
+    end
+    
+    it 'should find a shadow entry with #shadow', :if => shadow? do
+      Etc2.shadow('root').name.should == 'root'
+    end
+  end
+  
   context '#crypt' do
     it 'should encrypt a string with DES' do
       txt,salt = 'this is a test', 's1'

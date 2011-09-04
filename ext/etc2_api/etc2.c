@@ -323,6 +323,11 @@ void Init_etc2_api() {
 	rb_mEtc2 = rb_define_module("Etc2");
 	rb_define_module_function(rb_mEtc2, "has_shadow?", rb_mEtc2_hasShadow, 0);
 	rb_define_module_function(rb_mEtc2, "c_crypt", rb_mEtc2_c_crypt, -1);
+	rb_define_module_function(rb_mEtc2, "user", rb_cUser_find, 1);
+	rb_define_module_function(rb_mEtc2, "group", rb_cGroup_find, 1);
+#ifdef HAVE_SHADOW_H
+	rb_define_module_function(rb_mEtc2, "shadow", rb_cShadow_find, 1);
+#endif
 	
 	rb_cUser = rb_define_class_under(rb_mEtc2, "User", rb_cObject);
 	rb_define_module_function(rb_cUser, "find", rb_cUser_find, 1);
