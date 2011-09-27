@@ -15,7 +15,7 @@ describe Etc2::Shadow do
   
       it "should raise an argument error if the user can't be found with bang method" do
         user = 'fake'
-        lambda{ Etc2::Shadow.find!(user) }.should raise_error(ArgumentError, "Shadow entry not found for username: #{user}")
+        lambda{ Etc2::Shadow.find!(user) }.should raise_error(ArgumentError, "Shadow entry not found")
       end
     end
 

@@ -31,7 +31,7 @@ describe Etc2 do
       Etc2.group(0).gid.should == 0
     end
     
-    it 'should find a shadow entry with #shadow', :if => shadow? do
+    it 'should find a shadow entry with #shadow', :if => shadow? && root? do
       Etc2.shadow('root').name.should == 'root'
     end
   end
