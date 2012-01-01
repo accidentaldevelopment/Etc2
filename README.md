@@ -5,6 +5,13 @@ This library is a functional clone of Ruby's Etc library, part of the standard l
 Ruby's Etc is basically a very thin layer over the underlying C functions.  Which is fine, but I wanted a more Ruby-esque solution.
 This library uses its own objects instead of Structs, and it includes Shadow support (as long the platform does).
 
+etc2/replace
+---
+
+If you'd like, you can require 'etc2/replace' instead just etc2.  This will assign Etc2 to Etc, effectively replacing the built in Etc module.
+
+It also assigns the built in Etc to BuiltinEtc, so you can still access that library if needed
+
 \#user, \#group, \#shadow
 ---
 The Etc2 module defines three module functions: *user*, *group*, and *shadow*.
