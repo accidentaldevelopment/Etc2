@@ -1,5 +1,6 @@
 require 'rake/extensiontask'
 require 'rspec/core/rake_task'
+require 'cucumber/rake/task'
 require 'yard'
 
 # because I'm too lazy to remember to change this with each update
@@ -30,10 +31,11 @@ YARD::Rake::YardocTask.new do |yard|
   yard.options = ['--no-private']
 end
 
-desc 'Run specs'
 RSpec::Core::RakeTask.new(:specs => :compile) do |r|
   r.rspec_opts = '-f d' if ENV['FDOC']
   r.pattern = 'spec/**/*_spec.rb'
 end
 
-task :default => 'specs'
+Cucumber::Rake::Task.new(:features => :compile)
+
+task :default => 'features'
