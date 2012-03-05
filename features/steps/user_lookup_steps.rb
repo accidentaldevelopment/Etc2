@@ -10,12 +10,8 @@ Given /^a user with uid (\d+)$/ do |uid|
   @lookup = uid.to_i
 end
 
-When /^I call ([\w!]+)$/ do |method|
+When /^I call Etc2::Users\.([\w!]+)$/ do |method|
   @result = Etc2::User.send(method.intern, @lookup)
-end
-
-When /^I call Etc2::User\.find$/ do
-  @result = Etc2::User.find(@lookup)
 end
 
 Then /^I should get back an object with name (\w+)$/ do |username|

@@ -2,7 +2,7 @@ Feature: Searching for a user
 
   Scenario Outline: Looking up a user by username
     Given a user with username <username>
-    When I call <method>
+    When I call Etc2::Users.<method>
     Then I should get back an object with name <username>
     
     Examples:
@@ -12,7 +12,7 @@ Feature: Searching for a user
   
   Scenario Outline: Looking up a user by uid
     Given a user with uid <uid>
-    When I call <method>
+    When I call Etc2::Users.<method>
     Then I should get back an object with uid <uid>
     
     Examples:

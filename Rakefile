@@ -36,6 +36,11 @@ RSpec::Core::RakeTask.new(:specs => :compile) do |r|
   r.pattern = 'spec/**/*_spec.rb'
 end
 
-Cucumber::Rake::Task.new(:features => :compile)
+Cucumber::Rake::Task.new(:features => :compile) do |c|
+  c.cucumber_opts = []
+  c.cucumber_opts << '--format=progress' unless ENV['DOC']
+  c.cucumber_opts << '--tags ~@shadow'   unless File.exists? '/etc/shadow'
+  c.cucumber_opts << (Process.euid == 0 ? '--tags ~@nonroot' : '--tags ~@root')
+end
 
-task :default => 'features'
+task :default => :features
