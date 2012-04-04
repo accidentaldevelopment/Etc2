@@ -9,6 +9,10 @@ describe Etc2::Shadow do
         Etc2::Shadow.find('root').name.should == 'root'
       end
       
+      it 'should work with a symbol' do
+        Etc2::Shadow.find(:root).name.should == 'root'
+      end
+      
       it "should return nil if the user can't be found" do
         Etc2::Shadow.find('fake').should == nil
       end

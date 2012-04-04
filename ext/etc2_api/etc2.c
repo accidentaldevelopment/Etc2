@@ -52,9 +52,6 @@ VALUE rb_mEtc2_c_crypt(int argc, VALUE *argv, VALUE mod) {
 			case T_STRING:
 				result = crypt(STR2CSTR(txt), STR2CSTR(salt));
 				break;
-			// case T_HASH:
-			// 	result = crypt_with_hash(txt, salt);
-			// 	break;
 			default:
 				rb_raise(rb_eArgError, "String or Hash expected");
 		}
@@ -87,17 +84,19 @@ VALUE setup_user(struct passwd *p) {
  */
 VALUE rb_cUser_find(VALUE mod, VALUE user_lookup) {
 	struct passwd *p;
-	if(TYPE(user_lookup) == T_STRING) {
-		char *username = STR2CSTR(user_lookup);
+	
+	if(TYPE(user_lookup) == T_STRING || TYPE(user_lookup) == T_SYMBOL) {
+    VALUE user_lookup_string = rb_funcall(user_lookup, rb_intern("to_s"), 0); 
+		char *username = STR2CSTR(user_lookup_string);
 		p = getpwnam(username);
-		if(p == NULL) return Qnil;
 	}
 	else {
 		uid_t uid = NUM2UIDT(user_lookup);
 		p = getpwuid(uid);
-		if(p == NULL) return Qnil;
 	}
 	
+	if(!p)
+    return Qnil;
 	return setup_user(p);
 }
 
@@ -185,17 +184,19 @@ VALUE setup_group(struct group *g) {
  */
 VALUE rb_cGroup_find(VALUE mod, VALUE group_lookup) {
 	struct group *g;
-	if(TYPE(group_lookup) == T_STRING) {
-		char *groupname = STR2CSTR(group_lookup);
+	
+	if(TYPE(group_lookup) == T_STRING || TYPE(group_lookup) == T_SYMBOL) {
+	  VALUE group_lookup_string = rb_funcall(group_lookup, rb_intern("to_s"), 0);
+		char *groupname = STR2CSTR(group_lookup_string);
 		g = getgrnam(groupname);
-		if(g == NULL) return Qnil;
 	}
 	else {
 		gid_t gid = NUM2UIDT(group_lookup);
 		g = getgrgid(gid);
-		if(g == NULL) return Qnil;
 	}
 	
+	if(!g)
+    return Qnil;
 	return setup_group(g);
 }
 
@@ -266,11 +267,15 @@ VALUE setup_shadow(struct spwd *s) {
  */
 VALUE rb_cShadow_find(VALUE mod, VALUE shadow_lookup){
 	struct spwd *s;
-	char *shadowname = STR2CSTR(shadow_lookup);
+	VALUE shadow_lookup_string = rb_funcall(shadow_lookup, rb_intern("to_s"), 0);
+	char *shadowname = STR2CSTR(shadow_lookup_string);
 	s = getspnam(shadowname);
-	if (getuid() != 0 || geteuid() != 0) rb_raise(rb_const_get(rb_mErrno, rb_intern("EACCES")), "Must be root to access shadow database");
-	else if(s == NULL) return Qnil;
 	
+	if (getuid() != 0 || geteuid() != 0) 
+	  rb_raise(rb_const_get(rb_mErrno, rb_intern("EACCES")), "Must be root to access shadow database");
+	
+	if(!s) 
+	  return Qnil;
 	return setup_shadow(s);
 }
 

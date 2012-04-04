@@ -7,6 +7,10 @@ describe Etc2::Group do
       Etc2::Group.find('wheel').name.should == 'wheel'
     end
     
+    it 'should work if passed a symbol' do
+      Etc2::Group.find(:wheel).name.should == 'wheel'
+    end
+    
     it 'should find root from the gid' do
       Etc2::Group.find(0).name.should == Etc.getgrgid(0).name
     end

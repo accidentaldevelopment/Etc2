@@ -8,6 +8,10 @@ describe Etc2::User do
         Etc2::User.find('root').name.should == 'root'
       end
       
+      it 'should work if passed a symbol' do
+        Etc2::User.find(:root).name.should == 'root'
+      end
+      
       it "should return nil if the user can't be found" do
         Etc2::User.find('fake').should == nil
       end
